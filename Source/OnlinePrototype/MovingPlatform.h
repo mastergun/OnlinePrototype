@@ -18,11 +18,11 @@ public:
 	AMovingPlatform();
 	void BeginPlay();
 	virtual void Tick(float DeltaTime) override;
-	FVector velocity;
+	FVector dir;
 	UPROPERTY(EditAnywhere)
-		float acceleration;
+		float velocity;
 	FVector initPos;
-	UPROPERTY(EditAnywhere)
-		FVector finalPos;
-	void SetVelocity();
+	UPROPERTY(EditAnywhere, Meta=(MakeEditWidget = true))
+		FVector finalPos; // aquest vector estara en pos local del objecte en questio. 
+	void SetDirection();
 };

@@ -12,7 +12,8 @@ void AMovingPlatform::BeginPlay() {
 	Super::BeginPlay();
 	if (HasAuthority()) {
 		initPos = GetActorLocation();
-		SetVelocity();
+		finalPos = GetTransform().TransformPosition(finalPos); // amb aquesta funcio, transformes una pos local a global. si utilitzes el metode inverseTransformPosition, es per convertir de global a local
+		SetDirection();
 		SetReplicates(true); // informa que l'objecte s'ha de replicar en els clients 
 		SetReplicateMovement(true); //informa que el moviment del objecte s'ha de replicar en els clients
 	}
@@ -22,21 +23,21 @@ void AMovingPlatform::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 	if (HasAuthority()) {
 		FVector Location = GetActorLocation();
-		Location += velocity*DeltaTime;
+		Location += dir*DeltaTime;
 		SetActorLocation(Location);
 
 		if (finalPos.Distance(finalPos, GetActorLocation()) <= 10.0f) {
 			FVector newFinalPos = initPos;
 			initPos = finalPos;
 			finalPos = newFinalPos;
-			SetVelocity();
+			SetDirection();
 		}
 	}
 }
 
-void AMovingPlatform::SetVelocity() {
-	velocity = finalPos - initPos;
-	velocity = velocity.GetSafeNormal();
-	velocity *= acceleration;
+void AMovingPlatform::SetDirection() {
+	dir = finalPos - initPos;
+	dir.Normalize();
+	dir *= velocity;
 }
 
