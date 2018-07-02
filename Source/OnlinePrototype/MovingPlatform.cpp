@@ -10,8 +10,12 @@ AMovingPlatform::AMovingPlatform() {
 
 void AMovingPlatform::BeginPlay() {
 	Super::BeginPlay();
-	initPos = GetActorLocation();
-	SetVelocity();
+	if (HasAuthority()) {
+		initPos = GetActorLocation();
+		SetVelocity();
+		SetReplicates(true); // informa que l'objecte s'ha de replicar en els clients 
+		SetReplicateMovement(true); //informa que el moviment del objecte s'ha de replicar en els clients
+	}
 }
 
 void AMovingPlatform::Tick(float DeltaTime) {
