@@ -16,21 +16,31 @@ void AMovingPlatform::BeginPlay() {
 		SetDirection();
 		SetReplicates(true); // informa que l'objecte s'ha de replicar en els clients 
 		SetReplicateMovement(true); //informa que el moviment del objecte s'ha de replicar en els clients
+		timer = waitingTime;
+		moving = false;
 	}
 }
 
 void AMovingPlatform::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 	if (HasAuthority()) {
-		FVector Location = GetActorLocation();
-		Location += dir*DeltaTime;
-		SetActorLocation(Location);
+		if (moving) {
+			FVector Location = GetActorLocation();
+			Location += dir*DeltaTime;
+			SetActorLocation(Location);
 
-		if (finalPos.Distance(finalPos, GetActorLocation()) <= 10.0f) {
-			FVector newFinalPos = initPos;
-			initPos = finalPos;
-			finalPos = newFinalPos;
-			SetDirection();
+			if (PasedPoint()) {
+				FVector newFinalPos = initPos;
+				initPos = finalPos;
+				finalPos = newFinalPos;
+				SetDirection();
+				timer = waitingTime;
+				moving = false;
+			}
+		}
+		else {
+			timer -= DeltaTime;
+			if (timer <= 0) moving = true;
 		}
 	}
 }
@@ -39,5 +49,12 @@ void AMovingPlatform::SetDirection() {
 	dir = finalPos - initPos;
 	dir.Normalize();
 	dir *= velocity;
+}
+
+bool AMovingPlatform::PasedPoint() {
+	FVector toFinalPoint = finalPos - GetActorLocation();
+	float distance = FVector::DotProduct(dir, toFinalPoint);
+	if (distance <= 0)return true;
+	else return false;
 }
 
