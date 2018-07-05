@@ -10,6 +10,13 @@
 /**
  * 
  */
+UENUM(BlueprintType)
+enum class State : uint8
+{
+	Autonomous 	UMETA(DisplayName = "Autonomous"),
+	Controlled 	UMETA(DisplayName = "Controlled")
+};
+
 UCLASS()
 class ONLINEPROTOTYPE_API AMovingPlatform : public AStaticMeshActor
 {
@@ -26,10 +33,15 @@ public:
 		FVector finalPos; // aquest vector estara en pos local del objecte en questio. 
 	void SetDirection();
 	bool PasedPoint();
+	void SetState(State state);
+	void SetIsMoving(bool isMoving);
 
 private:
 	FVector initPos;
 	FVector dir;
 	bool moving;
 	float timer;
+	UPROPERTY(EditAnywhere)
+		State type;
+	
 };

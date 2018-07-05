@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Runtime/Engine/Classes/Components/BoxComponent.h"
+#include "Components/BoxComponent.h"
+#include "MovingPlatform.h"
 #include "PlatformTrigger.generated.h"
 
-UCLASS()
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FComponentEndOverlapSignature, class AActor*, OtherActor, class UPrimitiveComponent*, OtherComp, int32, OtherBodyIndex);
+
+UCLASS(BlueprintType)
 class ONLINEPROTOTYPE_API APlatformTrigger : public AActor
 {
 	GENERATED_BODY()
@@ -26,6 +29,13 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere)
 		UBoxComponent* triggerZone;
-	
-	
+	UPROPERTY(EditAnywhere)
+		TArray<class AMovingPlatform*> conectedPlatforms;
+	UFUNCTION()
+		void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, 
+							class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, 
+							const FHitResult& SweepResult);
+	UFUNCTION()
+		void OnOverlapEnd(	class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, 
+							class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };

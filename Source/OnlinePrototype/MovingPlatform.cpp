@@ -6,6 +6,7 @@ AMovingPlatform::AMovingPlatform() {
 	PrimaryActorTick.bCanEverTick = true;
 	SetMobility(EComponentMobility::Movable);
 	finalPos = FVector(0.0f, 0.0f, 0.0f);
+	SetState(State::Autonomous);
 }
 
 void AMovingPlatform::BeginPlay() {
@@ -14,9 +15,9 @@ void AMovingPlatform::BeginPlay() {
 		initPos = GetActorLocation();
 		finalPos = GetTransform().TransformPosition(finalPos); // amb aquesta funcio, transformes una pos local a global. si utilitzes el metode inverseTransformPosition, es per convertir de global a local
 		SetDirection();
+		SetState(type);
 		SetReplicates(true); // informa que l'objecte s'ha de replicar en els clients 
 		SetReplicateMovement(true); //informa que el moviment del objecte s'ha de replicar en els clients
-		timer = waitingTime;
 		moving = false;
 	}
 }
@@ -35,12 +36,14 @@ void AMovingPlatform::Tick(float DeltaTime) {
 				finalPos = newFinalPos;
 				SetDirection();
 				timer = waitingTime;
-				moving = false;
+				if(type == State::Autonomous) moving = false;
 			}
 		}
 		else {
-			timer -= DeltaTime;
-			if (timer <= 0) moving = true;
+			if (type == State::Autonomous) {
+				timer -= DeltaTime;
+				if (timer <= 0) moving = true;
+			}
 		}
 	}
 }
@@ -56,5 +59,15 @@ bool AMovingPlatform::PasedPoint() {
 	float distance = FVector::DotProduct(dir, toFinalPoint);
 	if (distance <= 0)return true;
 	else return false;
+}
+
+void AMovingPlatform::SetState(State state) {
+	type = state;
+	if (type == State::Autonomous)timer = waitingTime;
+	else if (type == State::Controlled)timer = 0;
+}
+
+void AMovingPlatform::SetIsMoving(bool isMoving) {
+	moving = isMoving;
 }
 
