@@ -31,6 +31,8 @@ public:
 		float waitingTime;
 	UPROPERTY(EditAnywhere, Meta=(MakeEditWidget = true))
 		FVector finalPos; // aquest vector estara en pos local del objecte en questio. 
+	UPROPERTY(EditAnywhere)
+		int triggersToActivate;
 	void SetDirection();
 	bool PasedPoint();
 	void SetState(State state);
@@ -43,5 +45,6 @@ private:
 	float timer;
 	UPROPERTY(EditAnywhere)
 		State type;
+	int numOfTriggers;
 	
 };

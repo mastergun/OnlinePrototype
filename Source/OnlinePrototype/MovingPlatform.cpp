@@ -7,6 +7,7 @@ AMovingPlatform::AMovingPlatform() {
 	SetMobility(EComponentMobility::Movable);
 	finalPos = FVector(0.0f, 0.0f, 0.0f);
 	SetState(State::Autonomous);
+	triggersToActivate = 0;
 }
 
 void AMovingPlatform::BeginPlay() {
@@ -68,6 +69,12 @@ void AMovingPlatform::SetState(State state) {
 }
 
 void AMovingPlatform::SetIsMoving(bool isMoving) {
-	moving = isMoving;
+	//save the order of a trigger
+	if (isMoving)numOfTriggers++;
+	else numOfTriggers--;
+
+	//set the movement of the platform
+	if (numOfTriggers >= triggersToActivate) moving = true;
+	else moving = false;
 }
 
