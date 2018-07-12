@@ -20,4 +20,9 @@ void UPrototypeGameInstance::Host() {
 
 void UPrototypeGameInstance::Join(const FString& IPadress) {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("IP adress: ")+IPadress);
+
+	APlayerController* playerController = GetFirstLocalPlayerController();
+	if (!ensure(playerController != nullptr)) return;
+
+	playerController->ClientTravel(IPadress, TRAVEL_Relative);
 }
