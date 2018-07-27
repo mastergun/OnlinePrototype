@@ -10,6 +10,7 @@
 #include "Blueprint/UserWidget.h"
 #include "MenuSystem/MainMenu.h"
 #include "MenuSystem/GameMenu.h"
+#include "MenuSystem/BaseMenu.h"
 #include "PrototypeGameInstance.generated.h"
 
 /**

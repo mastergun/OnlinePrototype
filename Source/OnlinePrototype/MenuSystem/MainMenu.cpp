@@ -9,13 +9,15 @@ bool UMainMenu::Initialize() {
 	if (!ensure(JoinButton != nullptr)) return false;
 	if (!ensure(JoinMenuButton != nullptr)) return false;
 	if (!ensure(CancelButton != nullptr)) return false;
+	if (!ensure(QuitButton != nullptr)) return false;
 	
 	HostButton->OnClicked.AddDynamic(this, &UMainMenu::HostOnClicked);
 	JoinButton->OnClicked.AddDynamic(this, &UMainMenu::JoinOnClicked);
 	JoinMenuButton->OnClicked.AddDynamic(this, &UMainMenu::LoadJoinMenu);
 	CancelButton->OnClicked.AddDynamic(this, &UMainMenu::LoadMainMenu);
+	QuitButton->OnClicked.AddDynamic(this, &UMainMenu::QuitGame);
+
 	return true;
-	
 }
 
 void UMainMenu::HostOnClicked() {
@@ -41,40 +43,9 @@ void UMainMenu::LoadMainMenu() {
 	MenuSwitcher->SetActiveWidget(MainMenu);
 }
 
-void UMainMenu::SetMenuInterface(IMenuInterface* reference) {
-	menuInterface = reference;
-	if (!ensure(menuInterface != nullptr)) return;
-}
+void UMainMenu::QuitGame() {
+	APlayerController* playerController = GetOwningPlayer();
+	if (!ensure(playerController != nullptr)) return;
 
-void UMainMenu::Setup() {
-	this->AddToViewport();
-	UWorld* world = GetWorld();
-	if (!ensure(world != nullptr)) return;
-
-	APlayerController* firtsPlayerController = world->GetFirstPlayerController();
-	if (!ensure(firtsPlayerController != nullptr)) return;
-
-	FInputModeUIOnly inputModeData;
-	inputModeData.SetWidgetToFocus(this->TakeWidget());
-	inputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-
-	firtsPlayerController->SetInputMode(inputModeData);
-	firtsPlayerController->bShowMouseCursor = true;
-}
-
-void UMainMenu::TearDown() {
-	this->RemoveFromViewport();
-
-	UWorld* world = GetWorld();
-	if (!ensure(world != nullptr)) return;
-
-	APlayerController* firtsPlayerController = world->GetFirstPlayerController();
-	if (!ensure(firtsPlayerController != nullptr)) return;
-
-	firtsPlayerController->bShowMouseCursor = false;
-
-	FInputModeGameOnly inputModeData;
-
-
-	firtsPlayerController->SetInputMode(inputModeData);
+	playerController->ConsoleCommand("Quit");
 }

@@ -64,17 +64,19 @@ void UPrototypeGameInstance::Join(const FString& IPadress) {
 	APlayerController* playerController = GetFirstLocalPlayerController();
 	if (!ensure(playerController != nullptr)) return;
 
-	playerController->ClientTravel(IPadress, TRAVEL_Relative);
+	playerController->ClientTravel(IPadress, TRAVEL_Absolute);
 }
 
 void UPrototypeGameInstance::MainMenuMap() {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("travel to main menu map called"));
 	if (gameMenu != nullptr) {
 		gameMenu->TearDown();
 	}
 
-	UWorld* world = GetWorld();
-	if (!ensure(world != nullptr)) return;
+	APlayerController* playerController = GetFirstLocalPlayerController();
+	if (!ensure(playerController != nullptr)) return;
 
-	world->ServerTravel("/Game/Maps/MainMenu?listen");
+	//per desconectar del servidor es important fer un client travel
+	//per que d'aquesta manera nomes viatja l'usuari i si es el host
+	//desconecta la partida. 
+	playerController->ClientTravel("/Game/Maps/MainMenu", TRAVEL_Absolute);
 }

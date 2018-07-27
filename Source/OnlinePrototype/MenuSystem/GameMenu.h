@@ -4,22 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Engine.h"
-#include "MenuSystem/MenuInterface.h"
 #include "Components/Button.h"
-#include "Blueprint/UserWidget.h"
+#include "BaseMenu.h"
 #include "GameMenu.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ONLINEPROTOTYPE_API UGameMenu : public UUserWidget
+class ONLINEPROTOTYPE_API UGameMenu : public UBaseMenu
 {
 	GENERATED_BODY()
-public:
-	void SetMenuInterface(IMenuInterface* reference);
-	void Setup();
-	void TearDown();
 protected:
 	virtual bool Initialize() override;
 private:
@@ -32,5 +27,4 @@ private:
 		UButton* MenuButton;
 	UPROPERTY(meta = (BindWidget))
 		UButton* CancelButton;
-	IMenuInterface* menuInterface;
 };

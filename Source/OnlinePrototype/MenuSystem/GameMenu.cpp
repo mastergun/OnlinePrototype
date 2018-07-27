@@ -22,39 +22,3 @@ void UGameMenu::CancelOnClicked() {
 	TearDown();
 }
 
-void UGameMenu::SetMenuInterface(IMenuInterface* reference) {
-	menuInterface = reference;
-	if (!ensure(menuInterface != nullptr)) return;
-}
-
-void UGameMenu::Setup() {
-	this->AddToViewport();
-	UWorld* world = GetWorld();
-	if (!ensure(world != nullptr)) return;
-
-	APlayerController* firtsPlayerController = world->GetFirstPlayerController();
-	if (!ensure(firtsPlayerController != nullptr)) return;
-	FInputModeUIOnly inputModeData;
-	inputModeData.SetWidgetToFocus(this->TakeWidget());
-	inputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-
-	firtsPlayerController->SetInputMode(inputModeData);
-	firtsPlayerController->bShowMouseCursor = true;
-}
-
-void UGameMenu::TearDown() {
-	this->RemoveFromViewport();
-
-	UWorld* world = GetWorld();
-	if (!ensure(world != nullptr)) return;
-
-	APlayerController* firtsPlayerController = world->GetFirstPlayerController();
-	if (!ensure(firtsPlayerController != nullptr)) return;
-
-	firtsPlayerController->bShowMouseCursor = false;
-
-	FInputModeGameOnly inputModeData;
-
-	firtsPlayerController->SetInputMode(inputModeData);
-}
-

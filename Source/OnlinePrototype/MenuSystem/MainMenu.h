@@ -4,8 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine.h"
-#include "MenuSystem/MenuInterface.h"
-#include "Blueprint/UserWidget.h"
+#include "BaseMenu.h"
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
 #include "Components/EditableTextBox.h"
@@ -15,13 +14,9 @@
  * 
  */
 UCLASS()
-class ONLINEPROTOTYPE_API UMainMenu : public UUserWidget
+class ONLINEPROTOTYPE_API UMainMenu : public UBaseMenu
 {
 	GENERATED_BODY()
-public:
-	void SetMenuInterface(IMenuInterface* reference);
-	void Setup();
-	void TearDown();
 protected:
 	virtual bool Initialize() override;
 private:
@@ -30,9 +25,12 @@ private:
 	UFUNCTION()
 	void JoinOnClicked();
 	UFUNCTION()
+	void QuitGame();
+	UFUNCTION()
 	void LoadJoinMenu();
 	UFUNCTION()
 	void LoadMainMenu();
+
 	UPROPERTY(meta = (BindWidget))
 	UButton* HostButton;
 	UPROPERTY(meta = (BindWidget))
@@ -42,6 +40,9 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UButton* CancelButton;
 	UPROPERTY(meta = (BindWidget))
+	UButton* QuitButton;
+
+	UPROPERTY(meta = (BindWidget))
 	UWidgetSwitcher* MenuSwitcher;
 	UPROPERTY(meta = (BindWidget))
 	UWidget* JoinMenu;
@@ -49,7 +50,4 @@ private:
 	UWidget* MainMenu;
 	UPROPERTY(meta = (BindWidget))
 	UEditableTextBox* IPAdressInput;
-
-	
-	IMenuInterface* menuInterface;
 };
