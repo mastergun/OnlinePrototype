@@ -74,7 +74,7 @@ void UMainMenu::TearDown() {
 	firtsPlayerController->bShowMouseCursor = false;
 
 	FInputModeGameOnly inputModeData;
-	//inputModeData.SetConsumeCaptureMouseDown(false);
+
 
 	firtsPlayerController->SetInputMode(inputModeData);
 }

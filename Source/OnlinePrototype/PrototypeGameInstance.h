@@ -9,6 +9,7 @@
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Blueprint/UserWidget.h"
 #include "MenuSystem/MainMenu.h"
+#include "MenuSystem/GameMenu.h"
 #include "PrototypeGameInstance.generated.h"
 
 /**
@@ -22,13 +23,20 @@ public:
 	UPrototypeGameInstance(const FObjectInitializer & ObjectInitializer);
 	virtual void Init();
 
-	UFUNCTION(Exec,BlueprintCallable)
-		void LoadMenu();
+	
+	UFUNCTION(Exec, BlueprintCallable)
+		void LoadMainMenu();
 	UFUNCTION(Exec)
 		virtual void Host() override;
 	UFUNCTION(Exec)
 		void Join(const FString& IPadress);
+	UFUNCTION(Exec, BlueprintCallable)
+		virtual void LoadGameMenu() override;
+	UFUNCTION(Exec)
+		virtual void MainMenuMap() override;
 private:
-	TSubclassOf<class UMainMenu> MenuReferenceClass;
-	UMainMenu* menu;
+	TSubclassOf<class UMainMenu> MainMenuReferenceClass;
+	TSubclassOf<class UGameMenu> GameMenuReferenceClass;
+	UMainMenu* mainMenu;
+	UGameMenu* gameMenu;
 };

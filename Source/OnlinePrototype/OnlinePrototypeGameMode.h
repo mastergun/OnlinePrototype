@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "PrototypeGameInstance.h" 
 #include "OnlinePrototypeGameMode.generated.h"
 
 UCLASS(minimalapi)
@@ -13,6 +14,9 @@ class AOnlinePrototypeGameMode : public AGameModeBase
 
 public:
 	AOnlinePrototypeGameMode();
+private:
+	UFUNCTION()
+		void LoadMenu();
 };
 
 
