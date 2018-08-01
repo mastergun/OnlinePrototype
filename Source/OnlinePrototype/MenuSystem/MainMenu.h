@@ -17,6 +17,8 @@ UCLASS()
 class ONLINEPROTOTYPE_API UMainMenu : public UBaseMenu
 {
 	GENERATED_BODY()
+public:
+	
 protected:
 	virtual bool Initialize() override;
 private:
@@ -32,9 +34,9 @@ private:
 	void LoadMainMenu();
 
 	UPROPERTY(meta = (BindWidget))
-	UButton* HostButton;
+		UButton* HostButton;
 	UPROPERTY(meta = (BindWidget))
-	UButton* JoinButton;
+		UButton* JoinButton;
 	UPROPERTY(meta = (BindWidget))
 	UButton* JoinMenuButton;
 	UPROPERTY(meta = (BindWidget))

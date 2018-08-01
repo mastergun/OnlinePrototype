@@ -8,6 +8,9 @@
 #include "MenuSystem/MenuInterface.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Blueprint/UserWidget.h"
+#include "OnlineSubsystem.h"
+#include "OnlineSessionSettings.h"
+#include "OnlineSessionInterface.h"
 #include "MenuSystem/MainMenu.h"
 #include "MenuSystem/GameMenu.h"
 #include "MenuSystem/BaseMenu.h"
@@ -40,4 +43,12 @@ private:
 	TSubclassOf<class UGameMenu> GameMenuReferenceClass;
 	UMainMenu* mainMenu;
 	UGameMenu* gameMenu;
+	void OnCreateSessionComplete(FName sessionName, bool success);
+	void OnDestroySessionComplete(FName sessionName, bool success);
+	void OnFindSessionsComplete(bool success);
+
+	TSharedPtr<FOnlineSessionSearch> sessionSearch;
+	IOnlineSessionPtr onlineSession;
+
+	void CreateSession();
 };

@@ -13,12 +13,12 @@ AOnlinePrototypeGameMode::AOnlinePrototypeGameMode()
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 	
-	UWorld* world = GetWorld();
+	/*UWorld* world = GetWorld();
 	if (!ensure(world != nullptr)) return;
 
 	APlayerController* firtsPlayerController = world->GetFirstPlayerController();
 	if (!ensure(firtsPlayerController != nullptr)) return;
-	firtsPlayerController->InputComponent->BindAction("OpenGameMenu", IE_Pressed, this, &AOnlinePrototypeGameMode::LoadMenu);
+	firtsPlayerController->InputComponent->BindAction("OpenGameMenu", IE_Pressed, this, &AOnlinePrototypeGameMode::LoadMenu);*/
 }
 
 void AOnlinePrototypeGameMode::LoadMenu() {
