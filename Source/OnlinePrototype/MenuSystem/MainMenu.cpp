@@ -27,7 +27,7 @@ void UMainMenu::HostOnClicked() {
 void UMainMenu::JoinOnClicked() {
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Client atempting to Join"));
 	if (!ensure(IPAdressInput != nullptr)) return;
-	if (menuInterface != nullptr) menuInterface->Join(IPAdressInput->GetText().ToString());
+	if (menuInterface != nullptr) menuInterface->JoinIP(IPAdressInput->GetText().ToString());
 	UE_LOG(LogTemp, Warning, TEXT("joinning"));
 }
 

@@ -5,14 +5,16 @@ const static FName SESSION_NAME = TEXT("Host first session");
 
 UPrototypeGameInstance::UPrototypeGameInstance(const FObjectInitializer & ObjectInitializer) {
 	static ConstructorHelpers::FClassFinder<UUserWidget> WBP_LobbyMenuClass(TEXT("/Game/Menus/WBP_LobbyMenu"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> WBP_ScrollBarClass(TEXT("/Game/Menus/WBP_ScrollBarMenu"));
 	static ConstructorHelpers::FClassFinder<UUserWidget> WBP_GameMenuClass(TEXT("/Game/Menus/WBP_GameMenu"));
 
 	if (!ensure(WBP_LobbyMenuClass.Class != nullptr)) return;
+	if (!ensure(WBP_ScrollBarClass.Class != nullptr)) return;
 	if (!ensure(WBP_GameMenuClass.Class != nullptr)) return;
 
 	MainMenuReferenceClass = WBP_LobbyMenuClass.Class;
 	GameMenuReferenceClass = WBP_GameMenuClass.Class;
-
+	ScrollBarMenuReferenceClass = WBP_ScrollBarClass.Class;
 	/*UE_LOG(LogTemp, Warning, TEXT("found class %s"), *WBP_LobbyMenuClass.Class->GetName());
 	UE_LOG(LogTemp, Warning, TEXT("found class %s"), *WBP_GameMenuClass.Class->GetName());*/
 }
@@ -27,13 +29,13 @@ void UPrototypeGameInstance::Init() {
 			onlineSession->OnCreateSessionCompleteDelegates.AddUObject(this, &UPrototypeGameInstance::OnCreateSessionComplete);
 			onlineSession->OnDestroySessionCompleteDelegates.AddUObject(this, &UPrototypeGameInstance::OnDestroySessionComplete);
 			onlineSession->OnFindSessionsCompleteDelegates.AddUObject(this, &UPrototypeGameInstance::OnFindSessionsComplete);
-
-			sessionSearch = MakeShareable(new FOnlineSessionSearch());
-			if (sessionSearch.IsValid()) {
-				UE_LOG(LogTemp, Warning, TEXT("start to find sessions"));
-				//sessionSearch->bIsLanQuery = true;
-				onlineSession->FindSessions(0, sessionSearch.ToSharedRef());
-			}
+			onlineSession->OnJoinSessionCompleteDelegates.AddUObject(this, &UPrototypeGameInstance::OnJoinSessionComplete);
+			//sessionSearch = MakeShareable(new FOnlineSessionSearch());
+			//if (sessionSearch.IsValid()) {
+			//	UE_LOG(LogTemp, Warning, TEXT("start to find sessions"));
+			//	sessionSearch->bIsLanQuery = true;
+			//	onlineSession->FindSessions(0, sessionSearch.ToSharedRef());
+			//}
 		}
 	}
 	else {
@@ -42,6 +44,14 @@ void UPrototypeGameInstance::Init() {
 	//UE_LOG(LogTemp, Warning, TEXT("found class %s"), *subsystemReference->GetName());
 	/*UE_LOG(LogTemp, Warning, TEXT("found class %s"), *MainMenuReferenceClass->GetName());
 	UE_LOG(LogTemp, Warning, TEXT("found class %s"), *GameMenuReferenceClass->GetName());*/
+}
+void UPrototypeGameInstance::LoadScrollBarMenu() {
+	if (!ensure(ScrollBarMenuReferenceClass != nullptr)) return;
+	scrollBarMenu = CreateWidget<UScrollBarMenu>(this, ScrollBarMenuReferenceClass);
+	if (!ensure(scrollBarMenu != nullptr)) return;
+
+	scrollBarMenu->Setup();
+	scrollBarMenu->SetMenuInterface(this);
 }
 
 void UPrototypeGameInstance::LoadMainMenu() {
@@ -90,29 +100,83 @@ void UPrototypeGameInstance::OnCreateSessionComplete(FName sessionName, bool suc
 	if (mainMenu != nullptr) {
 		mainMenu->TearDown();
 	}
+	if (scrollBarMenu != nullptr) {
+		scrollBarMenu->TearDown();
+	}
 	UWorld* world = GetWorld();
 	if (!ensure(world != nullptr)) return;
 	world->ServerTravel("/Game/ThirdPersonCPP/Maps/ThirdPersonExampleMap?listen");
 }
 
 void UPrototypeGameInstance::OnFindSessionsComplete( bool success) {
-	if (success && sessionSearch.IsValid()) {
+	if (success && sessionSearch.IsValid() && scrollBarMenu != nullptr) {
+		serverNames.Empty();
 		for (const FOnlineSessionSearchResult &results : sessionSearch->SearchResults) {
 			UE_LOG(LogTemp, Warning, TEXT("find session completed %s"), *results.GetSessionIdStr());
+			serverNames.Add(results.GetSessionIdStr());
 		}
+
+		scrollBarMenu->SetServerList(serverNames);
+		UE_LOG(LogTemp, Warning, TEXT("find session finished"));
 	}
+}
+
+void UPrototypeGameInstance::OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result) {
+	if (!onlineSession.IsValid())return;
+	FString adress;
+	if (!onlineSession->GetResolvedConnectString(sessionName, adress)) {
+		UE_LOG(LogTemp, Warning, TEXT("error to joinning session"));
+		return;
+	}
+
+	APlayerController* playerController = GetFirstLocalPlayerController();
+	if (!ensure(playerController != nullptr)) return;
+	playerController->ClientTravel(adress, TRAVEL_Absolute);
 }
 
 void UPrototypeGameInstance::CreateSession() {
 	FOnlineSessionSettings sessionSettings;
-	sessionSettings.bIsLANMatch = true;
+	//si aquesta opcio esta a true, nomes es podran fer sesions en LAN
+	if(IOnlineSubsystem::Get()->GetSubsystemName().ToString() == "NULL" ){
+		sessionSettings.bIsLANMatch = true; 
+	}
+	else {
+		sessionSettings.bIsLANMatch = false;
+	}
 	sessionSettings.NumPublicConnections = 2;
 	sessionSettings.bShouldAdvertise = true;
+	//si posem la presence a true, ens permetrar crear lobbies.
+	//si esta a false es per crear sessions en internet propies.
+	//per aquesta ultima opccio segurament sera necesari comprar el servidor dedicat d'steam
+	sessionSettings.bUsesPresence = true;
 	onlineSession->CreateSession(0, SESSION_NAME, sessionSettings);
 }
 
-void UPrototypeGameInstance::Join(const FString& IPadress) {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("IP adress: ")+IPadress);
+void UPrototypeGameInstance::FindSessions(){
+	sessionSearch = MakeShareable(new FOnlineSessionSearch());
+	if (sessionSearch.IsValid()) {
+		UE_LOG(LogTemp, Warning, TEXT("start to find sessions"));
+		//sessionSearch->bIsLanQuery = false;
+		sessionSearch->MaxSearchResults = 1000;
+		sessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+		onlineSession->FindSessions(0, sessionSearch.ToSharedRef());
+	}		
+}
+
+void UPrototypeGameInstance::Join(const uint32 id) {
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("IP adress: ")+IPadress);
+	if (!onlineSession.IsValid())return;
+	if (!sessionSearch.IsValid())return;
+
+	if (scrollBarMenu != nullptr) {
+		scrollBarMenu->TearDown();
+	}
+
+	onlineSession->JoinSession(0, SESSION_NAME, sessionSearch->SearchResults[id]);
+}
+
+void UPrototypeGameInstance::JoinIP(const FString IPAdress) {
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("IP adress: ")+IPadress);
 
 	if (mainMenu != nullptr) {
 		mainMenu->TearDown();
@@ -121,7 +185,7 @@ void UPrototypeGameInstance::Join(const FString& IPadress) {
 	APlayerController* playerController = GetFirstLocalPlayerController();
 	if (!ensure(playerController != nullptr)) return;
 
-	playerController->ClientTravel(IPadress, TRAVEL_Absolute);
+	playerController->ClientTravel(IPAdress, TRAVEL_Absolute);
 }
 
 void UPrototypeGameInstance::MainMenuMap() {
@@ -137,3 +201,6 @@ void UPrototypeGameInstance::MainMenuMap() {
 	//desconecta la partida. 
 	playerController->ClientTravel("/Game/Maps/MainMenu", TRAVEL_Absolute);
 }
+
+
+

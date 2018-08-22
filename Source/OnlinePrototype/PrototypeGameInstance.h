@@ -11,6 +11,7 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSessionInterface.h"
+#include "MenuSystem/ScrollBarMenu.h"
 #include "MenuSystem/MainMenu.h"
 #include "MenuSystem/GameMenu.h"
 #include "MenuSystem/BaseMenu.h"
@@ -26,27 +27,38 @@ class ONLINEPROTOTYPE_API UPrototypeGameInstance : public UGameInstance ,public 
 public:
 	UPrototypeGameInstance(const FObjectInitializer & ObjectInitializer);
 	virtual void Init();
-
-	
+	//virtual UPrototypeGameInstance* GetSelfReference() override;
+	UFUNCTION(Exec, BlueprintCallable)
+		virtual void LoadScrollBarMenu() override;
 	UFUNCTION(Exec, BlueprintCallable)
 		void LoadMainMenu();
 	UFUNCTION(Exec)
 		virtual void Host() override;
 	UFUNCTION(Exec)
-		void Join(const FString& IPadress);
+		void Join(const uint32 id);
+	UFUNCTION(Exec)
+		void JoinIP(const FString IPAdress);
+	UFUNCTION(Exec)
+		void FindSessions();
 	UFUNCTION(Exec, BlueprintCallable)
 		virtual void LoadGameMenu() override;
 	UFUNCTION(Exec)
 		virtual void MainMenuMap() override;
 private:
 	TSubclassOf<class UMainMenu> MainMenuReferenceClass;
+	TSubclassOf<class UScrollBarMenu> ScrollBarMenuReferenceClass;
 	TSubclassOf<class UGameMenu> GameMenuReferenceClass;
+
+	UScrollBarMenu* scrollBarMenu;
 	UMainMenu* mainMenu;
 	UGameMenu* gameMenu;
+
 	void OnCreateSessionComplete(FName sessionName, bool success);
 	void OnDestroySessionComplete(FName sessionName, bool success);
 	void OnFindSessionsComplete(bool success);
+	void OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result);
 
+	TArray<FString> serverNames;
 	TSharedPtr<FOnlineSessionSearch> sessionSearch;
 	IOnlineSessionPtr onlineSession;
 
