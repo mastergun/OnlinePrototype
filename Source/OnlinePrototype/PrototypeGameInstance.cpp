@@ -110,10 +110,21 @@ void UPrototypeGameInstance::OnCreateSessionComplete(FName sessionName, bool suc
 
 void UPrototypeGameInstance::OnFindSessionsComplete( bool success) {
 	if (success && sessionSearch.IsValid() && scrollBarMenu != nullptr) {
-		serverNames.Empty();
+		TArray<FServerData> serverNames;
 		for (const FOnlineSessionSearchResult &results : sessionSearch->SearchResults) {
 			UE_LOG(LogTemp, Warning, TEXT("find session completed %s"), *results.GetSessionIdStr());
-			serverNames.Add(results.GetSessionIdStr());
+			FServerData data;
+			data.serverName = results.GetSessionIdStr();
+			data.hostUserName = results.Session.OwningUserName;
+			data.maxPlayers = results.Session.SessionSettings.NumPublicConnections;
+			FString dataName;
+			if (results.Session.SessionSettings.Get(TEXT("test"), dataName)) {
+				UE_LOG(LogTemp, Warning, TEXT("sesion name is %s"), *dataName);
+			}
+			else {
+				UE_LOG(LogTemp, Warning, TEXT("didn't get the expected data"));
+			}
+			serverNames.Add(data);
 		}
 
 		scrollBarMenu->SetServerList(serverNames);
@@ -149,6 +160,7 @@ void UPrototypeGameInstance::CreateSession() {
 	//si esta a false es per crear sessions en internet propies.
 	//per aquesta ultima opccio segurament sera necesari comprar el servidor dedicat d'steam
 	sessionSettings.bUsesPresence = true;
+	sessionSettings.Set(TEXT("test"), FString("hello"),EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 	onlineSession->CreateSession(0, SESSION_NAME, sessionSettings);
 }
 

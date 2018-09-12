@@ -58,7 +58,7 @@ private:
 	void OnFindSessionsComplete(bool success);
 	void OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result);
 
-	TArray<FString> serverNames;
+	//TArray<FServerData> serverNames;
 	TSharedPtr<FOnlineSessionSearch> sessionSearch;
 	IOnlineSessionPtr onlineSession;
 

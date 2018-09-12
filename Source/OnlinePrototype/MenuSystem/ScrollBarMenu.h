@@ -31,7 +31,7 @@ class ONLINEPROTOTYPE_API UScrollBarMenu : public UBaseMenu
 	GENERATED_BODY()
 public:
 	UScrollBarMenu(const FObjectInitializer & ObjectInitializer);
-	void SetServerList(TArray<FString> ServerNames);
+	void SetServerList(TArray<FServerData> ServerNames);
 	void SelectIndex(uint32 index);
 protected:
 	virtual bool Initialize() override;

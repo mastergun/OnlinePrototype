@@ -21,6 +21,10 @@ public:
 	//UServerRow(const FObjectInitializer &ObjectInitializer);
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* ServerText;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* NumOfPlayers;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* HostName;
 	UPROPERTY(blueprintReadOnly)
 		bool isCliked;
 	void Setup(class UScrollBarMenu* menu, uint32 index);	

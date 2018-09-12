@@ -26,18 +26,20 @@ bool UScrollBarMenu::Initialize() {
 	return true;
 }
 
-void UScrollBarMenu::SetServerList(TArray<FString> ServerNames) {
+void UScrollBarMenu::SetServerList(TArray<FServerData> ServerNames) {
 	if (!ensure(ServerScroll != nullptr)) return;
 	ServerScroll->ClearChildren();
 
 	UWorld* world = this->GetWorld();
 	if (!ensure(world != nullptr)) return;
 	uint32 index = 0;
-	for (const FString& serverName : ServerNames) {
+	for (const FServerData& serverData : ServerNames) {
 		UServerRow* serverRow = CreateWidget<UServerRow>(world, ServerRowReferenceClass);
 		if (!ensure(serverRow != nullptr)) return;
 		serverRow->Setup(this, index);
-		serverRow->ServerText->SetText(FText::FromString(serverName));
+		serverRow->ServerText->SetText(FText::FromString(serverData.serverName));
+		serverRow->HostName->SetText(FText::FromString(serverData.hostUserName));
+		serverRow->NumOfPlayers->SetText(FText::FromString(FString::FromInt(serverData.numOfPlayers) + "/" + FString::FromInt(serverData.maxPlayers)));
 		ServerScroll->AddChild(serverRow);
 		index++;
 	}
