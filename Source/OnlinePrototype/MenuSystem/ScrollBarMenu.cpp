@@ -12,17 +12,20 @@ bool UScrollBarMenu::Initialize() {
 	if (!Super::Initialize()) return false;
 
 	if (!ensure(HostButton != nullptr)) return false;
+	if (!ensure(HostMenuButton != nullptr)) return false;
+	if (!ensure(CancelHostButton != nullptr)) return false;
 	if (!ensure(JoinButton != nullptr)) return false;
 	if (!ensure(JoinMenuButton != nullptr)) return false;
 	if (!ensure(CancelButton != nullptr)) return false;
 	if (!ensure(QuitButton != nullptr)) return false;
 
 	HostButton->OnClicked.AddDynamic(this, &UScrollBarMenu::HostOnClicked);
+	HostMenuButton->OnClicked.AddDynamic(this, &UScrollBarMenu::LoadHostMenu);
 	JoinButton->OnClicked.AddDynamic(this, &UScrollBarMenu::JoinOnClicked);
 	JoinMenuButton->OnClicked.AddDynamic(this, &UScrollBarMenu::LoadJoinMenu);
 	CancelButton->OnClicked.AddDynamic(this, &UScrollBarMenu::LoadMainMenu);
+	CancelHostButton->OnClicked.AddDynamic(this, &UScrollBarMenu::LoadMainMenu);
 	QuitButton->OnClicked.AddDynamic(this, &UScrollBarMenu::QuitGame);
-
 	return true;
 }
 
@@ -47,7 +50,14 @@ void UScrollBarMenu::SetServerList(TArray<FServerData> ServerNames) {
 
 void UScrollBarMenu::HostOnClicked() {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Client atempting to Join"));
-	if (menuInterface != nullptr) menuInterface->Host();
+	if (HostName != nullptr) { 
+		if (menuInterface != nullptr) menuInterface->HostWithSessionName(FName(*HostName->GetText().ToString()));
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("host text box input doesn't exist!!!"));
+		menuInterface->Host();
+	}
+	//if (menuInterface != nullptr) menuInterface->Host();
 }
 
 void UScrollBarMenu::SelectIndex(uint32 index){
@@ -90,6 +100,12 @@ void UScrollBarMenu::LoadMainMenu() {
 	if (!ensure(MenuSwitcher != nullptr)) return;
 	if (!ensure(MainMenu != nullptr)) return;
 	MenuSwitcher->SetActiveWidget(MainMenu);
+}
+
+void UScrollBarMenu::LoadHostMenu() {
+	if (!ensure(MenuSwitcher != nullptr)) return;
+	if (!ensure(HostMenu != nullptr)) return;
+	MenuSwitcher->SetActiveWidget(HostMenu);
 }
 
 void UScrollBarMenu::QuitGame() {

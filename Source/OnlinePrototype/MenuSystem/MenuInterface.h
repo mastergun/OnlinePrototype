@@ -24,6 +24,7 @@ public:
 	virtual void Host()= 0;
 	virtual void Join(const uint32 id) = 0;
 	virtual void JoinIP(const FString IPAdress) = 0;
+	virtual void HostWithSessionName(const FName HostName) = 0;
 	virtual void FindSessions() = 0;
 	virtual void MainMenuMap() = 0;
 	virtual void LoadGameMenu() = 0;

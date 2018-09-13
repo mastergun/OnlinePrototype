@@ -2,6 +2,7 @@
 
 #include "PrototypeGameInstance.h"
 const static FName SESSION_NAME = TEXT("Host first session");
+const static FName SESSION_NAME_SETINGS_KEY = TEXT("SessionName");
 
 UPrototypeGameInstance::UPrototypeGameInstance(const FObjectInitializer & ObjectInitializer) {
 	static ConstructorHelpers::FClassFinder<UUserWidget> WBP_LobbyMenuClass(TEXT("/Game/Menus/WBP_LobbyMenu"));
@@ -15,6 +16,7 @@ UPrototypeGameInstance::UPrototypeGameInstance(const FObjectInitializer & Object
 	MainMenuReferenceClass = WBP_LobbyMenuClass.Class;
 	GameMenuReferenceClass = WBP_GameMenuClass.Class;
 	ScrollBarMenuReferenceClass = WBP_ScrollBarClass.Class;
+	
 	/*UE_LOG(LogTemp, Warning, TEXT("found class %s"), *WBP_LobbyMenuClass.Class->GetName());
 	UE_LOG(LogTemp, Warning, TEXT("found class %s"), *WBP_GameMenuClass.Class->GetName());*/
 }
@@ -75,10 +77,25 @@ void UPrototypeGameInstance::LoadGameMenu() {
 }
 
 void UPrototypeGameInstance::Host() {
+	UE_LOG(LogTemp, Warning, TEXT("hosting without name session"));
 	if (onlineSession.IsValid()) {
 		auto existingSession = onlineSession->GetNamedSession(SESSION_NAME);
 		if (existingSession != nullptr) {
 			onlineSession->DestroySession(SESSION_NAME);
+		}
+		else {
+			CreateSession();
+		}
+	}
+}
+
+void UPrototypeGameInstance::HostWithSessionName(const FName HostName) {
+	UE_LOG(LogTemp, Warning, TEXT("hosting with name session"));
+	session_Name = HostName.ToString();
+	if (onlineSession.IsValid()) {
+		auto existingSession = onlineSession->GetNamedSession(SESSION_NAME);
+		if (existingSession != nullptr) {
+			onlineSession->DestroySession(SESSION_NAME);	
 		}
 		else {
 			CreateSession();
@@ -114,16 +131,18 @@ void UPrototypeGameInstance::OnFindSessionsComplete( bool success) {
 		for (const FOnlineSessionSearchResult &results : sessionSearch->SearchResults) {
 			UE_LOG(LogTemp, Warning, TEXT("find session completed %s"), *results.GetSessionIdStr());
 			FServerData data;
-			data.serverName = results.GetSessionIdStr();
-			data.hostUserName = results.Session.OwningUserName;
-			data.maxPlayers = results.Session.SessionSettings.NumPublicConnections;
+			//data.serverName = results.GetSessionIdStr();
 			FString dataName;
-			if (results.Session.SessionSettings.Get(TEXT("test"), dataName)) {
-				UE_LOG(LogTemp, Warning, TEXT("sesion name is %s"), *dataName);
+			if (results.Session.SessionSettings.Get(SESSION_NAME_SETINGS_KEY, dataName)) {
+				data.serverName = dataName;
 			}
 			else {
-				UE_LOG(LogTemp, Warning, TEXT("didn't get the expected data"));
+				data.serverName = results.GetSessionIdStr();
 			}
+
+			data.hostUserName = results.Session.OwningUserName;
+			data.maxPlayers = results.Session.SessionSettings.NumPublicConnections;
+			
 			serverNames.Add(data);
 		}
 
@@ -160,7 +179,7 @@ void UPrototypeGameInstance::CreateSession() {
 	//si esta a false es per crear sessions en internet propies.
 	//per aquesta ultima opccio segurament sera necesari comprar el servidor dedicat d'steam
 	sessionSettings.bUsesPresence = true;
-	sessionSettings.Set(TEXT("test"), FString("hello"),EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+	sessionSettings.Set(SESSION_NAME_SETINGS_KEY, session_Name,EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 	onlineSession->CreateSession(0, SESSION_NAME, sessionSettings);
 }
 
@@ -199,6 +218,8 @@ void UPrototypeGameInstance::JoinIP(const FString IPAdress) {
 
 	playerController->ClientTravel(IPAdress, TRAVEL_Absolute);
 }
+
+
 
 void UPrototypeGameInstance::MainMenuMap() {
 	if (gameMenu != nullptr) {

@@ -9,6 +9,7 @@
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
 #include "Components/PanelWidget.h"
+#include "Components/EditableTextBox.h"
 #include "MenuSystem/ServerRow.h"
 #include "ScrollBarMenu.generated.h"
 
@@ -46,15 +47,24 @@ private:
 		void LoadJoinMenu();
 	UFUNCTION()
 		void LoadMainMenu();
+	UFUNCTION()
+		void LoadHostMenu();
 
+	//host buttons
 	UPROPERTY(meta = (BindWidget))
 		UButton* HostButton;
+	UPROPERTY(meta = (BindWidget))
+		UButton* HostMenuButton;
+	UPROPERTY(meta = (BindWidget))
+		UButton* CancelHostButton;
+	//join buttons
 	UPROPERTY(meta = (BindWidget))
 		UButton* JoinButton;
 	UPROPERTY(meta = (BindWidget))
 		UButton* JoinMenuButton;
 	UPROPERTY(meta = (BindWidget))
 		UButton* CancelButton;
+	//game buttons
 	UPROPERTY(meta = (BindWidget))
 		UButton* QuitButton;
 
@@ -65,7 +75,11 @@ private:
 	UPROPERTY(meta = (BindWidget))
 		UWidget* MainMenu;
 	UPROPERTY(meta = (BindWidget))
+		UWidget* HostMenu;
+	UPROPERTY(meta = (BindWidget))
 		UPanelWidget* ServerScroll;
+	UPROPERTY(meta = (BindWidget))
+		UEditableTextBox* HostName;
 
 	TSubclassOf<UServerRow> ServerRowReferenceClass;
 	TOptional<uint32> rowIndex;

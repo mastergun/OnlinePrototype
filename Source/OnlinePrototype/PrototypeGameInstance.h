@@ -39,6 +39,8 @@ public:
 	UFUNCTION(Exec)
 		void JoinIP(const FString IPAdress);
 	UFUNCTION(Exec)
+		void HostWithSessionName(const FName HostName);
+	UFUNCTION(Exec)
 		void FindSessions();
 	UFUNCTION(Exec, BlueprintCallable)
 		virtual void LoadGameMenu() override;
@@ -52,6 +54,7 @@ private:
 	UScrollBarMenu* scrollBarMenu;
 	UMainMenu* mainMenu;
 	UGameMenu* gameMenu;
+	FString session_Name;
 
 	void OnCreateSessionComplete(FName sessionName, bool success);
 	void OnDestroySessionComplete(FName sessionName, bool success);
