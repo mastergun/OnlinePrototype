@@ -122,7 +122,9 @@ void UPrototypeGameInstance::OnCreateSessionComplete(FName sessionName, bool suc
 	}
 	UWorld* world = GetWorld();
 	if (!ensure(world != nullptr)) return;
-	world->ServerTravel("/Game/ThirdPersonCPP/Maps/ThirdPersonExampleMap?listen");
+	//world->ServerTravel("/Game/ThirdPersonCPP/Maps/ThirdPersonExampleMap?listen");
+	world->ServerTravel("/Game/Maps/Lobby?listen");
+	
 }
 
 void UPrototypeGameInstance::OnFindSessionsComplete( bool success) {
