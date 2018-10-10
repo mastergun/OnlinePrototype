@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PrototypeGameInstance.h"
-const static FName SESSION_NAME = TEXT("Host first session");
+const static FName SESSION_NAME = TEXT("Game");
 const static FName SESSION_NAME_SETINGS_KEY = TEXT("SessionName");
 
 UPrototypeGameInstance::UPrototypeGameInstance(const FObjectInitializer & ObjectInitializer) {
@@ -143,6 +143,7 @@ void UPrototypeGameInstance::OnFindSessionsComplete( bool success) {
 			}
 
 			data.hostUserName = results.Session.OwningUserName;
+			data.numOfPlayers = results.Session.NumOpenPublicConnections;
 			data.maxPlayers = results.Session.SessionSettings.NumPublicConnections;
 			
 			serverNames.Add(data);
